@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusBite - College Canteen Live Food Availability</title>
+  
+  <style>
+    /* ==========================================================================
+       1. CSS VARIABLES (DESIGN SYSTEM - GREEN & WHITE THEME)
+       ========================================================================== */
+    :root {
+      /* Green palette */
+      --primary-green: #10b981;        /* Fresh Emerald Green */
+      --primary-dark: #059669;         /* Darker Green for hover states */
+      --primary-darker: #064e3b;       /* Deep Forest Green for headings */
+      --primary-light: #ecfdf5;        /* Mint Light Green for backgrounds */
+      --primary-border: #a7f3d0;       /* Soft Green for borders */
+      
+      /* Neutral colors */
+      --white: #ffffff;
+      --bg-body: #f8fafc;              /* Soft clean off-white */
+      --text-main: #1f2937;            /* Charcoal for high readability */
+      --text-muted: #6b7280;           /* Soft gray for subtexts */
+      --border-color: #e5e7eb;         /* Light gray border */
+      
+      /* Status indicator colors */
+      --status-available-bg: #dcfce7;
+      --status-available-text: #15803d;
+      --status-limited-bg: #fef3c7;
+      --status-limited-text: #b45309;
+      --status-soldout-bg: #fee2e2;
+      --status-soldout-text: #b91c1c;
+
+      /* Box shadows and transitions */
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+      --radius: 14px;
+      --transition: all 0.25s ease-in-out;
+    }
+
+    /* ==========================================================================
+       2. RESET & BASE STYLES
+       ========================================================================== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding-bottom: 90px; /* Space so floating chatbot button doesn't block content */
+    }
+
+    /* ==========================================================================
+       3. HEADER & HERO SECTION
+       ========================================================================== */
+    header {
+      background: linear-gradient(135deg, #064e3b 0%, #059669 100%);
+      color: var(--white);
+      padding: 2.2rem 1.5rem 3rem 1.5rem;
+      position: relative;
+      box-shadow: var(--shadow-md);
+    }
+
+    .header-container {
+      max-width: 1150px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-icon {
+      font-size: 2.2rem;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.4rem 0.6rem;
+      border-radius: 12px;
+      backdrop-filter: blur(5px);
+    }
+
+    .logo-text h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-text p {
+      font-size: 0.85rem;
+      color: var(--primary-border);
+      font-weight: 500;
+    }
+
+    .canteen-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      padding: 0.45rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    .pulse-dot {
+      width: 10px;
+      height: 10px;
+      background-color: #34d399;
+      border-radius: 50%;
+      box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.8);
+      }
+      70% {
+        box-shadow: 0 0 0 8px rgba(52, 211, 153, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+      }
+    }
+
+    .hero-text {
+      max-width: 650px;
+      margin-top: 0.5rem;
+    }
+
+    .hero-text h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 0.4rem;
+    }
+
+    .hero-text p {
+      font-size: 1rem;
+      color: #e6fffa;
+      opacity: 0.95;
+    }
+
+    /* Disclaimer bar */
+    .disclaimer-banner {
+      background-color: #fefce8;
+      border-left: 4px solid #eab308;
+      color: #713f12;
+      padding: 0.75rem 1.25rem;
+      margin: -1.5rem auto 1.5rem auto;
+      max-width: 1150px;
+      width: calc(100% - 2rem);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      z-index: 5;
+    }
+
+    /* ==========================================================================
+       4. MAIN CONTAINER & LIVE STATS DASHBOARD
+       ========================================================================== */
+    .main-container {
+      max-width: 1150px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    /* Summary Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .stat-card {
+      background: var(--white);
+      padding: 1.2rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: var(--transition);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stat-icon {
+      font-size: 1.8rem;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+    }
+
+    .stat-icon.total { background: #f0fdf4; }
+    .stat-icon.available { background: var(--status-available-bg); }
+    .stat-icon.limited { background: var(--status-limited-bg); }
+    .stat-icon.soldout { background: var(--status-soldout-bg); }
+
+    .stat-info h3 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.1;
+    }
+
+    .stat-info p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-top: 0.2rem;
+    }
+
+    /* ==========================================================================
+       5. SEARCH & FILTER CONTROLS
+       ========================================================================== */
+    .controls-wrapper {
+      background: var(--white);
+      padding: 1.25rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
+      margin-bottom: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .search-box {
+      position: relative;
+      width: 100%;
+    }
+
+    .search-box span.search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.85rem 1rem 0.85rem 2.85rem;
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: var(--transition);
+      background-color: #fafafa;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary-green);
+      background-color: var(--white);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    }
+
+    .filter-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .filter-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .filter-btn {
+      background: var(--bg-body);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: var(--transition);
+    }
+
+    .filter-btn:hover {
+      background-color: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .filter-btn.active {
+      background-color: var(--primary-green);
+      color: var(--white);
+      border-color: var(--primary-green);
+      box-shadow: 0 2px 4px rgba(16, 185, 129, 0.25);
+    }
+
+    .results-count {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* ==========================================================================
+       6. FOOD ITEMS CARDS GRID
+       ========================================================================== */
+    .food-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 1.4rem;
+    }
+
+    .food-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .food-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary-border);
+    }
+
+    .food-card.sold-out {
+      opacity: 0.75;
+      background-color: #fafafc;
+    }
+
+    .card-banner {
+      background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+      padding: 1.5rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .food-card.sold-out .card-banner {
+      background: #f8fafc;
+    }
+
+    .food-emoji {
+      font-size: 4rem;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+      transition: transform 0.3s ease;
+    }
+
+    .food-card:hover .food-emoji {
+      transform: scale(1.12) rotate(3deg);
+    }
+
+    .category-badge {
+      position: absolute;
+      top: 0.75rem;
+      left: 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .badge-veg {
+      background-color: #dcfce7;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+
+    .badge-nonveg {
+      background-color: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+    .card-body {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .food-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.3;
+    }
+
+    .food-price {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+      white-space: nowrap;
+    }
+
+    .status-badge {
+      display: inline-block;
+      align-self: flex-start;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.3rem 0.7rem;
+      border-radius: 9999px;
+      margin-bottom: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-available {
+      background-color: var(--status-available-bg);
+      color: var(--status-available-text);
+      border: 1px solid #bbf7d0;
+    }
+
+    .status-limited {
+      background-color: var(--status-limited-bg);
+      color: var(--status-limited-text);
+      border: 1px solid #fde68a;
+    }
+
+    .status-soldout {
+      background-color: var(--status-soldout-bg);
+      color: var(--status-soldout-text);
+      border: 1px solid #fecaca;
+    }
+
+    .card-footer {
+      margin-top: auto;
+      padding-top: 0.75rem;
+      border-top: 1px dashed var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .wait-time {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 600;
+    }
+
+    .wait-time.highlight {
+      color: #d97706; /* slightly warmer for longer wait */
+    }
+
+    /* Empty state */
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3.5rem 1rem;
+      background: var(--white);
+      border-radius: var(--radius);
+      border: 2px dashed var(--border-color);
+    }
+
+    .no-results-icon {
+      font-size: 3rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .no-results h4 {
+      font-size: 1.2rem;
+      color: var(--text-main);
+      margin-bottom: 0.25rem;
+    }
+
+    .no-results p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       7. CHATBOT: "CANTEEN BUDDY"
+       ========================================================================== */
+    /* Floating toggle button */
+    .chatbot-toggle-btn {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+      color: var(--white);
+      border: none;
+      border-radius: 9999px;
+      padding: 0.85rem 1.4rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
+      transition: var(--transition);
+      z-index: 1000;
+    }
+
+    .chatbot-toggle-btn:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.45);
+    }
+
+    .chatbot-toggle-btn .bot-icon-bubble {
+      font-size: 1.3rem;
+    }
+
+    /* Chatbot window */
+    .chatbot-card {
+      position: fixed;
+      bottom: 5.5rem;
+      right: 1.5rem;
+      width: 360px;
+      max-width: calc(100vw - 2rem);
+      height: 500px;
+      max-height: calc(100vh - 7rem);
+      background: var(--white);
+      border-radius: 18px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 1000;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      transform-origin: bottom right;
+    }
+
+    .chatbot-card.hidden {
+      opacity: 0;
+      transform: scale(0.85) translateY(20px);
+      pointer-events: none;
+      visibility: hidden;
+    }
+
+    .chat-header {
+      background: linear-gradient(135deg, #064e3b 0%, #059669 100%);
+      color: var(--white);
+      padding: 0.9rem 1.1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-header-info {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .chat-bot-avatar {
+      font-size: 1.5rem;
+      background: rgba(255, 255, 255, 0.2);
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .chat-title h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .chat-title p {
+      font-size: 0.75rem;
+      color: #a7f3d0;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .chat-header-close {
+      background: none;
+      border: none;
+      color: var(--white);
+      font-size: 1.3rem;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: var(--transition);
+      padding: 0.2rem;
+      line-height: 1;
+    }
+
+    .chat-header-close:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    /* Messages container */
+    .chat-messages {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      background-color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .message {
+      max-width: 82%;
+      padding: 0.75rem 0.95rem;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      border-radius: 14px;
+      word-wrap: break-word;
+      animation: messageIn 0.25s ease-out forwards;
+    }
+
+    @keyframes messageIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .message.bot {
+      background: var(--white);
+      color: var(--text-main);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .message.bot strong {
+      color: var(--primary-darker);
+    }
+
+    .message.user {
+      background: var(--primary-green);
+      color: var(--white);
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+
+    /* Quick question chips */
+    .quick-chips {
+      padding: 0.5rem 0.9rem;
+      background: var(--white);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 0.4rem;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: thin;
+    }
+
+    .chip-btn {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      border: 1px solid var(--primary-border);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.35rem 0.65rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .chip-btn:hover {
+      background: var(--primary-green);
+      color: var(--white);
+      border-color: var(--primary-green);
+    }
+
+    /* Chat input form */
+    .chat-input-area {
+      padding: 0.75rem 0.9rem;
+      background: var(--white);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 0.65rem 0.9rem;
+      border: 1.5px solid var(--border-color);
+      border-radius: 20px;
+      font-size: 0.88rem;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .chat-input:focus {
+      border-color: var(--primary-green);
+    }
+
+    .chat-send-btn {
+      background: var(--primary-green);
+      color: var(--white);
+      border: none;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .chat-send-btn:hover {
+      background: var(--primary-dark);
+      transform: scale(1.05);
+    }
+
+    /* ==========================================================================
+       8. FOOTER
+       ========================================================================== */
+    footer {
+      max-width: 1150px;
+      margin: 3rem auto 0 auto;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    footer p {
+      margin-bottom: 0.3rem;
+    }
+
+    .badge-code {
+      display: inline-block;
+      background: #e2e8f0;
+      color: #334155;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.78rem;
+    }
+
+    /* ==========================================================================
+       9. RESPONSIVE DESIGN (TABLETS & PHONES)
+       ========================================================================== */
+    @media (max-width: 768px) {
+      .hero-text h2 {
+        font-size: 1.6rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .filter-section {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .filter-buttons {
+        width: 100%;
+      }
+
+      .filter-btn {
+        flex: 1 1 calc(50% - 0.5rem);
+        justify-content: center;
+      }
+
+      .chatbot-card {
+        right: 1rem;
+        bottom: 5rem;
+        width: calc(100vw - 2rem);
+        height: 460px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .canteen-status-badge {
+        align-self: flex-start;
+      }
+
+      .food-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       HEADER & NAVIGATION
+       ========================================================================== -->
+  <header>
+    <div class="header-container">
+      <div class="top-bar">
+        <div class="logo-area">
+          <div class="logo-icon">🍽️</div>
+          <div class="logo-text">
+            <h1>CampusBite</h1>
+            <p>College Canteen Live Availability</p>
+          </div>
+        </div>
+
+        <div class="canteen-status-badge">
+          <span class="pulse-dot"></span>
+          <span>Canteen Open (8:00 AM - 5:30 PM)</span>
+        </div>
+      </div>
+
+      <div class="hero-text">
+        <h2>Save Your Break Time. Check Food Before You Walk In.</h2>
+        <p>Real-time mock status of your favourite snacks, lunch meals, prices, and kitchen waiting times.</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- DEMONSTRATION NOTICE -->
+  <div class="disclaimer-banner">
+    <span>💡</span>
+    <span><strong>Notice:</strong> This website displays simulated sample data for academic demonstration. Availability and waiting times update dynamically within the page!</span>
+  </div>
+
+  <!-- ==========================================================================
+       MAIN CONTENT CONTAINER
+       ========================================================================== -->
+  <main class="main-container">
+
+    <!-- LIVE DASHBOARD SUMMARY CARDS -->
+    <section class="stats-grid" aria-label="Canteen Summary Overview">
+      <div class="stat-card">
+        <div class="stat-icon total">🍱</div>
+        <div class="stat-info">
+          <h3 id="statTotal">0</h3>
+          <p>Total Items</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon available">🟢</div>
+        <div class="stat-info">
+          <h3 id="statAvailable">0</h3>
+          <p>Ready & Available</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon limited">🟠</div>
+        <div class="stat-info">
+          <h3 id="statLimited">0</h3>
+          <p>Limited Stock</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon soldout">🔴</div>
+        <div class="stat-info">
+          <h3 id="statSoldOut">0</h3>
+          <p>Sold Out</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEARCH & FILTER INTERACTION CONTROLS -->
+    <section class="controls-wrapper" aria-label="Search and Filter Controls">
+      <!-- Search input -->
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          id="searchInput" 
+          class="search-input" 
+          placeholder="Search by food name (e.g., Burger, Dosa, Rice, Pizza)..."
+          autocomplete="off"
+        >
+      </div>
+
+      <!-- Filter buttons -->
+      <div class="filter-section">
+        <div class="filter-buttons" id="filterButtonsContainer">
+          <button class="filter-btn active" data-filter="all">
+            <span>✨</span> All Items
+          </button>
+          <button class="filter-btn" data-filter="Available">
+            <span>🟢</span> Available
+          </button>
+          <button class="filter-btn" data-filter="Limited Stock">
+            <span>🟠</span> Limited Stock
+          </button>
+          <button class="filter-btn" data-filter="Sold Out">
+            <span>🔴</span> Sold Out
+          </button>
+        </div>
+
+        <div class="results-count" id="resultsCount">
+          Showing 0 items
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOD ITEMS DISPLAY GRID -->
+    <section aria-label="Food Menu Items">
+      <div class="food-grid" id="foodGrid">
+        <!-- Food item cards will be generated here by JavaScript -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================================================
+       CANTEEN BUDDY CHATBOT WIDGET
+       ========================================================================== -->
+  <!-- Floating Launch Button -->
+  <button id="chatbotToggleBtn" class="chatbot-toggle-btn" aria-label="Open Canteen Buddy Chatbot">
+    <span class="bot-icon-bubble">💬</span>
+    <span>Ask Canteen Buddy</span>
+  </button>
+
+  <!-- Chatbot Window Container -->
+  <div id="chatbotCard" class="chatbot-card hidden" role="dialog" aria-labelledby="chatbotHeading">
+    <!-- Header -->
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-bot-avatar">🤖</div>
+        <div class="chat-title">
+          <h4 id="chatbotHeading">Canteen Buddy</h4>
+          <p><span class="pulse-dot" style="width: 7px; height: 7px;"></span> Online Assistant</p>
+        </div>
+      </div>
+      <button id="chatCloseBtn" class="chat-header-close" aria-label="Close Chat">✕</button>
+    </div>
+
+    <!-- Messages Log Area -->
+    <div class="chat-messages" id="chatMessages">
+      <div class="message bot">
+        👋 Hey there! I am <strong>Canteen Buddy</strong>. Ask me anything about our food availability, prices, or waiting times!
+      </div>
+    </div>
+
+    <!-- Quick Question Suggestion Chips -->
+    <div class="quick-chips">
+      <button class="chip-btn" onclick="sendQuickMessage('What is available right now?')">🟢 What's available?</button>
+      <button class="chip-btn" onclick="sendQuickMessage('What is the price of Veg Burger?')">🍔 Veg Burger price?</button>
+      <button class="chip-btn" onclick="sendQuickMessage('How long is the waiting time?')">⏱️ Waiting times?</button>
+      <button class="chip-btn" onclick="sendQuickMessage('What items are sold out?')">🔴 Sold out items?</button>
+    </div>
+
+    <!-- Input Form -->
+    <form class="chat-input-area" id="chatForm">
+      <input 
+        type="text" 
+        id="chatInput" 
+        class="chat-input" 
+        placeholder="Type a question (e.g., 'Is Dosa ready?')..."
+        autocomplete="off"
+      >
+      <button type="submit" class="chat-send-btn" aria-label="Send message">➤</button>
+    </form>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p><strong>CampusBite</strong> &bull; College Canteen Live Food Availability System</p>
+    <p>Built with <span class="badge-code">HTML</span>, <span class="badge-code">CSS</span>, and <span class="badge-code">JavaScript</span> (Beginner Friendly Front-End Project)</p>
+  </footer>
+
+  <!-- ==========================================================================
+       JAVASCRIPT CODE
+       Fully commented for first-year beginners to learn and understand
+       ========================================================================== -->
+  <script>
+    /* ==========================================================================
+       STEP 1: SAMPLE DATA (OUR MENU)
+       --------------------------------------------------------------------------
+       In professional websites, this data comes from a server or database.
+       For this beginner project, we store our food items directly in a JavaScript 
+       "Array of Objects" right inside this file.
+       ========================================================================== */
+    const foodItems = [
+      {
+        id: 1,
+        name: "Veg Burger",
+        category: "Veg",
+        emoji: "🍔",
+        price: 50,
+        status: "Available",        // Options: "Available", "Limited Stock", "Sold Out"
+        waitingTime: "5 - 7 mins",
+        description: "Crispy vegetable patty with fresh lettuce and creamy mayonnaise."
+      },
+      {
+        id: 2,
+        name: "Masala Dosa",
+        category: "Veg",
+        emoji: "🥞",
+        price: 40,
+        status: "Available",
+        waitingTime: "8 - 10 mins",
+        description: "Golden crispy crepe stuffed with spiced potato filling, served with chutney & sambar."
+      },
+      {
+        id: 3,
+        name: "Veg Fried Rice",
+        category: "Veg",
+        emoji: "🍚",
+        price: 60,
+        status: "Limited Stock",
+        waitingTime: "10 - 12 mins",
+        description: "Wok-tossed basmati rice with carrots, beans, bell peppers, and mild oriental spices."
+      },
+      {
+        id: 4,
+        name: "Chicken Sandwich",
+        category: "Non-Veg",
+        emoji: "🥪",
+        price: 70,
+        status: "Available",
+        waitingTime: "6 - 8 mins",
+        description: "Toasted bread layered with tender shredded chicken, herbs, and garlic mayo."
+      },
+      {
+        id: 5,
+        name: "Cheese Pizza",
+        category: "Veg",
+        emoji: "🍕",
+        price: 90,
+        status: "Sold Out",
+        waitingTime: "15 - 20 mins",
+        description: "Classic hand-tossed personal pizza topped with rich mozzarella cheese & herbs."
+      },
+      {
+        id: 6,
+        name: "Samosa (2 Pcs)",
+        category: "Veg",
+        emoji: "🥟",
+        price: 15,
+        status: "Limited Stock",
+        waitingTime: "2 - 3 mins",
+        description: "Crispy fried pastry triangles filled with seasoned potatoes and green peas."
+      },
+      {
+        id: 7,
+        name: "Cold Coffee",
+        category: "Veg",
+        emoji: "🧋",
+        price: 35,
+        status: "Available",
+        waitingTime: "3 - 5 mins",
+        description: "Chilled whipped coffee blend served in a tall glass with cocoa powder dusting."
+      },
+      {
+        id: 8,
+        name: "Paneer Roll",
+        category: "Veg",
+        emoji: "🌯",
+        price: 55,
+        status: "Sold Out",
+        waitingTime: "7 - 10 mins",
+        description: "Soft paratha roll stuffed with marinated paneer cubes, onions, and mint chutney."
+      }
+    ];
+
+    /* ==========================================================================
+       STEP 2: ACCESS HTML ELEMENTS USING JAVASCRIPT (DOM SELECTION)
+       --------------------------------------------------------------------------
+       "DOM" stands for Document Object Model. It lets JavaScript inspect and 
+       change HTML tags on the page. We use document.getElementById() to link
+       variables in JavaScript with HTML elements via their unique IDs.
+       ========================================================================== */
+    const foodGrid = document.getElementById("foodGrid");
+    const searchInput = document.getElementById("searchInput");
+    const filterButtonsContainer = document.getElementById("filterButtonsContainer");
+    const resultsCount = document.getElementById("resultsCount");
+
+    // Dashboard metric counter elements
+    const statTotal = document.getElementById("statTotal");
+    const statAvailable = document.getElementById("statAvailable");
+    const statLimited = document.getElementById("statLimited");
+    const statSoldOut = document.getElementById("statSoldOut");
+
+    // Chatbot elements
+    const chatbotToggleBtn = document.getElementById("chatbotToggleBtn");
+    const chatbotCard = document.getElementById("chatbotCard");
+    const chatCloseBtn = document.getElementById("chatCloseBtn");
+    const chatForm = document.getElementById("chatForm");
+    const chatInput = document.getElementById("chatInput");
+    const chatMessages = document.getElementById("chatMessages");
+
+    /* Current active filter state ("all", "Available", "Limited Stock", or "Sold Out") */
+    let currentFilter = "all";
+
+    /* ==========================================================================
+       STEP 3: HELPER FUNCTION TO GET STATUS CSS CLASS
+       --------------------------------------------------------------------------
+       This small helper function returns the matching CSS styling class based
+       on whether an item is "Available", "Limited Stock", or "Sold Out".
+       ========================================================================== */
+    function getStatusBadgeClass(status) {
+      if (status === "Available") return "status-available";
+      if (status === "Limited Stock") return "status-limited";
+      if (status === "Sold Out") return "status-soldout";
+      return "";
+    }
+
+    /* ==========================================================================
+       STEP 4: RENDER FOOD CARDS TO THE SCREEN
+       --------------------------------------------------------------------------
+       This function takes a list (array) of food items and generates HTML cards
+       for each of them, then places them into the food grid container.
+       ========================================================================== */
+    function renderFoodCards(items) {
+      // Clear out any existing cards first
+      foodGrid.innerHTML = "";
+
+      // Check if no items match the search or filter
+      if (items.length === 0) {
+        foodGrid.innerHTML = `
+          <div class="no-results">
+            <div class="no-results-icon">🔍🍽️</div>
+            <h4>No Food Items Found</h4>
+            <p>Try searching for a different item name or switch your filter.</p>
+          </div>
+        `;
+        resultsCount.textContent = "Showing 0 items";
+        return;
+      }
+
+      // Loop through each food item and build card HTML
+      items.forEach(item => {
+        // Create an HTML article tag for the card
+        const card = document.createElement("article");
+        card.className = `food-card ${item.status === "Sold Out" ? "sold-out" : ""}`;
+
+        // Vegetarian vs Non-Vegetarian badge label
+        const categoryClass = item.category === "Veg" ? "badge-veg" : "badge-nonveg";
+        const categoryDot = item.category === "Veg" ? "🟢" : "🔴";
+
+        // Card HTML structure
+        card.innerHTML = `
+          <div class="card-banner">
+            <span class="category-badge ${categoryClass}">
+              ${categoryDot} ${item.category}
+            </span>
+            <span class="food-emoji" role="img" aria-label="${item.name}">${item.emoji}</span>
+          </div>
+
+          <div class="card-body">
+            <div class="card-header">
+              <h3 class="food-name">${item.name}</h3>
+              <span class="food-price">₹${item.price}</span>
+            </div>
+
+            <span class="status-badge ${getStatusBadgeClass(item.status)}">
+              ● ${item.status}
+            </span>
+
+            <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 0.9rem;">
+              ${item.description}
+            </p>
+
+            <div class="card-footer">
+              <span class="wait-time">
+                <span>⏱️</span>
+                <span>Wait: <strong>${item.waitingTime}</strong></span>
+              </span>
+              <span style="font-size: 0.78rem; font-weight: 600; color: ${item.status === 'Sold Out' ? '#ef4444' : '#10b981'};">
+                ${item.status === 'Sold Out' ? 'Unavailable' : 'Kitchen Active'}
+              </span>
+            </div>
+          </div>
+        `;
+
+        // Add this card into our grid
+        foodGrid.appendChild(card);
+      });
+
+      // Update the counter text
+      resultsCount.textContent = `Showing ${items.length} of ${foodItems.length} items`;
+    }
+
+    /* ==========================================================================
+       STEP 5: UPDATE DASHBOARD SUMMARY STATS
+       --------------------------------------------------------------------------
+       Calculates how many items are Available, Limited Stock, and Sold Out,
+       and displays the numbers in the top cards.
+       ========================================================================== */
+    function updateSummaryStats() {
+      const total = foodItems.length;
+      
+      // Use the JavaScript .filter() array method to count items matching each status
+      const availableCount = foodItems.filter(item => item.status === "Available").length;
+      const limitedCount = foodItems.filter(item => item.status === "Limited Stock").length;
+      const soldOutCount = foodItems.filter(item => item.status === "Sold Out").length;
+
+      // Update text in our HTML summary cards
+      statTotal.textContent = total;
+      statAvailable.textContent = availableCount;
+      statLimited.textContent = limitedCount;
+      statSoldOut.textContent = soldOutCount;
+    }
+
+    /* ==========================================================================
+       STEP 6: SEARCH & FILTER LOGIC
+       --------------------------------------------------------------------------
+       Filters the foodItems list based on:
+       1) The text entered in the search bar.
+       2) The selected filter button (All, Available, Limited, Sold Out).
+       ========================================================================== */
+    function applySearchAndFilter() {
+      const searchQuery = searchInput.value.toLowerCase().trim();
+
+      const filteredList = foodItems.filter(item => {
+        // Condition A: Does the name or description include the search text?
+        const matchesSearch = item.name.toLowerCase().includes(searchQuery) ||
+                              item.description.toLowerCase().includes(searchQuery);
+
+        // Condition B: Does the item match the active status button filter?
+        let matchesFilter = true;
+        if (currentFilter !== "all") {
+          matchesFilter = (item.status === currentFilter);
+        }
+
+        // Keep item only if both conditions are true
+        return matchesSearch && matchesFilter;
+      });
+
+      // Render the newly filtered items to the screen
+      renderFoodCards(filteredList);
+    }
+
+    // EVENT LISTENER: Run whenever user types in the search bar
+    searchInput.addEventListener("input", () => {
+      applySearchAndFilter();
+    });
+
+    // EVENT LISTENER: Handle clicks on the filter buttons
+    filterButtonsContainer.addEventListener("click", (event) => {
+      // Find the closest button clicked inside the container
+      const targetButton = event.target.closest(".filter-btn");
+      if (!targetButton) return;
+
+      // Remove the 'active' class from all buttons
+      const allButtons = filterButtonsContainer.querySelectorAll(".filter-btn");
+      allButtons.forEach(btn => btn.classList.remove("active"));
+
+      // Add 'active' class to the clicked button
+      targetButton.classList.add("active");
+
+      // Update our filter variable and re-render
+      currentFilter = targetButton.getAttribute("data-filter");
+      applySearchAndFilter();
+    });
+
+    /* ==========================================================================
+       STEP 7: "CANTEEN BUDDY" CHATBOT LOGIC
+       --------------------------------------------------------------------------
+       Answers questions using intelligent keyword matching.
+       Understands questions regarding:
+       - Menu items ("burger", "dosa", "pizza", etc.)
+       - Availability ("available", "ready", "what can I eat")
+       - Sold out items ("sold out", "finished")
+       - Prices ("price", "cost", "how much")
+       - Waiting times ("waiting time", "how long", "time", "rush")
+       - Greetings and help ("hi", "hello", "help")
+       ========================================================================== */
+
+    // Function to add a chat message bubble to the chat container
+    function appendChatMessage(sender, text) {
+      const messageElement = document.createElement("div");
+      messageElement.className = `message ${sender}`;
+      messageElement.innerHTML = text;
+      chatMessages.appendChild(messageElement);
+
+      // Auto-scroll to the latest message at the bottom
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Function that computes the answer based on keywords in the student's question
+    function getBotResponse(userText) {
+      const text = userText.toLowerCase().trim();
+
+      // 1. GREETINGS
+      if (text.includes("hi") || text.includes("hello") || text.includes("hey") || text.includes("good morning")) {
+        return "👋 Hello! I am your <strong>Canteen Buddy</strong>. You can ask me what food is currently available, check item prices, or ask about waiting times!";
+      }
+
+      // 2. CHECK SPECIFIC FOOD ITEMS
+      for (const item of foodItems) {
+        // If the user's message mentions this item's name (e.g. "burger", "dosa", "samosa")
+        const itemNameLower = item.name.toLowerCase();
+        // Check main words (e.g., "dosa", "burger", "rice", "sandwich", "pizza", "samosa", "coffee")
+        const keywords = itemNameLower.split(" ");
+        const matched = keywords.some(word => word.length > 3 && text.includes(word));
+
+        if (text.includes(itemNameLower) || matched) {
+          let statusEmoji = item.status === "Available" ? "🟢" : (item.status === "Limited Stock" ? "🟠" : "🔴");
+          return `
+            ${item.emoji} <strong>${item.name}</strong><br>
+            • <strong>Price:</strong> ₹${item.price}<br>
+            • <strong>Status:</strong> ${statusEmoji} ${item.status}<br>
+            • <strong>Est. Waiting Time:</strong> ⏱️ ${item.waitingTime}<br>
+            <em>${item.description}</em>
+          `;
+        }
+      }
+
+      // 3. QUESTIONS ABOUT WHAT IS AVAILABLE
+      if (text.includes("available") || text.includes("ready") || text.includes("in stock") || text.includes("what to eat")) {
+        const readyItems = foodItems
+          .filter(i => i.status === "Available")
+          .map(i => `${i.emoji} ${i.name} (₹${i.price})`)
+          .join("<br>");
+
+        return `
+          🟢 <strong>Here are the items ready right now:</strong><br><br>
+          ${readyItems}<br><br>
+          Order quickly before break ends!
+        `;
+      }
+
+      // 4. QUESTIONS ABOUT SOLD OUT ITEMS
+      if (text.includes("sold out") || text.includes("finished") || text.includes("out of stock") || text.includes("unavailable")) {
+        const soldOutList = foodItems
+          .filter(i => i.status === "Sold Out")
+          .map(i => `• ${i.emoji} ${i.name} (₹${i.price})`)
+          .join("<br>");
+
+        if (!soldOutList) {
+          return "Good news! No items are sold out at this moment! 🎉";
+        }
+
+        return `
+          🔴 <strong>The following items are currently Sold Out:</strong><br><br>
+          ${soldOutList}<br><br>
+          Kitchen staff are preparing new batches soon.
+        `;
+      }
+
+      // 5. QUESTIONS ABOUT LIMITED STOCK ITEMS
+      if (text.includes("limited") || text.includes("fast") || text.includes("running out")) {
+        const limitedList = foodItems
+          .filter(i => i.status === "Limited Stock")
+          .map(i => `• ${i.emoji} ${i.name} (₹${i.price}) — ⏱️ ${i.waitingTime}`)
+          .join("<br>");
+
+        return `
+          🟠 <strong>Hurry, these items have Limited Stock left:</strong><br><br>
+          ${limitedList}
+        `;
+      }
+
+      // 6. QUESTIONS ABOUT PRICES / BUDGET
+      if (text.includes("price") || text.includes("rate") || text.includes("cost") || text.includes("cheap") || text.includes("menu")) {
+        return `
+          💰 <strong>CampusBite Price Guide:</strong><br>
+          • Samosa (2 Pcs): ₹15 <em>(Pocket friendly!)</em><br>
+          • Cold Coffee: ₹35<br>
+          • Masala Dosa: ₹40<br>
+          • Veg Burger: ₹50<br>
+          • Veg Fried Rice: ₹60<br>
+          • Chicken Sandwich: ₹70<br>
+          • Cheese Pizza: ₹90
+        `;
+      }
+
+      // 7. QUESTIONS ABOUT WAITING TIME
+      if (text.includes("waiting") || text.includes("wait") || text.includes("time") || text.includes("delay") || text.includes("fastest")) {
+        return `
+          ⏱️ <strong>Fastest snacks right now:</strong><br>
+          • 🥟 <strong>Samosa</strong>: Only 2 - 3 mins wait!<br>
+          • 🧋 <strong>Cold Coffee</strong>: 3 - 5 mins wait!<br>
+          • 🍔 <strong>Veg Burger</strong>: 5 - 7 mins wait!<br><br>
+          Items like Fried Rice and Pizzas require 10-15 minutes preparation.
+        `;
+      }
+
+      // 8. QUESTIONS ABOUT CANTEEN HOURS / OPENING
+      if (text.includes("open") || text.includes("close") || text.includes("timing") || text.includes("hours")) {
+        return "⏰ Our college canteen is open Monday through Saturday from <strong>8:00 AM to 5:30 PM</strong>.";
+      }
+
+      // 9. FRIENDLY DEFAULT / FALLBACK RESPONSE
+      return `
+        🤔 I'm not quite sure about that! Try asking:<br>
+        • <em>"What is available?"</em><br>
+        • <em>"Is Veg Burger ready?"</em><br>
+        • <em>"Show me waiting times"</em><br>
+        • <em>"What is the cheapest item?"</em>
+      `;
+    }
+
+    // Handles form submission when user clicks "Send" or presses Enter
+    chatForm.addEventListener("submit", (e) => {
+      e.preventDefault(); // Prevents browser page from refreshing
+      const userText = chatInput.value.trim();
+
+      if (userText === "") return;
+
+      // 1. Display user's message
+      appendChatMessage("user", userText);
+      chatInput.value = "";
+
+      // 2. Simulate natural bot response with a small realistic delay (350ms)
+      setTimeout(() => {
+        const botReply = getBotResponse(userText);
+        appendChatMessage("bot", botReply);
+      }, 350);
+    });
+
+    // Helper to send message when student clicks on suggestion chips
+    function sendQuickMessage(text) {
+      appendChatMessage("user", text);
+      setTimeout(() => {
+        const botReply = getBotResponse(text);
+        appendChatMessage("bot", botReply);
+      }, 300);
+    }
+
+    // Chatbot window toggle open/close handlers
+    chatbotToggleBtn.addEventListener("click", () => {
+      chatbotCard.classList.toggle("hidden");
+      if (!chatbotCard.classList.contains("hidden")) {
+        chatInput.focus();
+      }
+    });
+
+    chatCloseBtn.addEventListener("click", () => {
+      chatbotCard.classList.add("hidden");
+    });
+
+    /* ==========================================================================
+       STEP 8: INITIALIZE PAGE ON LOAD
+       --------------------------------------------------------------------------
+       When the web page first finishes loading in the browser, we calculate 
+       the summary counts and render all cards to the screen.
+       ========================================================================== */
+    window.addEventListener("DOMContentLoaded", () => {
+      updateSummaryStats();
+      renderFoodCards(foodItems);
+    });
+  </script>
+</body>
+</html>
